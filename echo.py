@@ -52,5 +52,5 @@ sentiment = sia.polarity_scores(text)
 print(sentiment) #judges sentiment vaguely
 
 
-#goal is to create a friendship, regardless of if the input is good or bad i think
+#goal is to create a friendship, regardless of if the input is good or bad 
 #goal is to now use the their mood and tempo to respond better.
