@@ -11,7 +11,8 @@ from itertools import chain
 from collections import Counter
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from collections import Counter
-
+nltk.download('wordnet')
+from nltk.corpus import wordnet
 
 
 
@@ -40,6 +41,8 @@ def moodJudgement():
     very_common_words = []
     positive_sentiments = []
     negative_sentiments = []
+    sad_sentiments = []
+    mad_sentiments = []
 
     for i in range(1):
         input_array.append(input("tell me about your day:       "))
@@ -83,11 +86,26 @@ def moodJudgement():
     print(negative_sentiments)
 
 
+
+
+
     #try to identify sadness
+    
+    for syn in wordnet.synsets('sad'):
+        for lemma in syn.lemmas():
+            sad_sentiments.append(lemma.name())
+    print(sad_sentiments)
 
-    #try to indentify nervousnesss
+    
 
+    #try to indentify anger
 
+    for syn in wordnet.synsets('mad'):
+        for lemma in syn.lemmas():
+            mad_sentiments.append(lemma.name())
+    print(mad_sentiments)
+
+    #try to indentify anger
 
 
 
