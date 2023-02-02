@@ -1,17 +1,10 @@
-
-
 import nltk
-nltk.download('punkt')
-from nltk.tokenize import word_tokenize 
-from nltk.tokenize import sent_tokenize
-import nltk
-nltk.download('averaged_perceptron_tagger')
-from nltk import pos_tag
+nltk.download('words')
+from nltk.tokenize import word_tokenize, sent_tokenize
+from nltk import word_tokenize, pos_tag, ne_chunk
 from itertools import chain
 from collections import Counter
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-from collections import Counter
-nltk.download('wordnet')
 from nltk.corpus import wordnet
 
 
@@ -22,90 +15,68 @@ from nltk.corpus import wordnet
 
 
 
+class MoodJudgement:
+    def __init__(self):
+        self.input_array = []
+        self.very_common_words = []
+        self.positive_sentiments = []
+        self.negative_sentiments = []
+        self.medium_sentiments = []
+        self.sad_sentiments = []
+        self.mad_sentiments = []
 
+    def get_input(self):
+        for i in range(1):
+            self.input_array.append(input("Tell me about your day: "))
 
+    def ner(self):
+        for text in self.input_array:
+            tokens = nltk.word_tokenize(text)
+            pos_tags = nltk.pos_tag(tokens)
+            named_entities = nltk.ne_chunk(pos_tags)
+            print(named_entities)
 
+    def tokenize_input(self):
+        self.tokens = [word_tokenize(i) for i in self.input_array]
+        self.more_tokens = [sent_tokenize(i) for i in self.input_array]
+        self.flattened_tokens = list(chain.from_iterable(self.tokens))
+        self.tagged_tokens = pos_tag(self.flattened_tokens)
 
-#input      
+    def sentiment_analysis(self):
+        text = " ".join(self.flattened_tokens)
+        sia = SentimentIntensityAnalyzer()
+        sentiment = sia.polarity_scores(text)
+        print(sentiment)
+        if sentiment['compound'] > 0.7:
+            self.positive_sentiments.append("good mood")
+        elif sentiment['compound'] < -0.7:
+            self.negative_sentiments.append("bad mood")
+        elif sentiment['compound'] >= -0.7 and sentiment['compound'] <= 0.7:
+            self.medium_sentiments.append("medium mood")
+        print(self.positive_sentiments)
+        print(self.negative_sentiments)
+        print(self.medium_sentiments)
 
+    def get_common_words(self):
+        word_count = Counter(self.flattened_tokens)
+        for word, count in word_count.most_common(10):
+            print(f'{word}: {count}')
 
-def moodJudgement():
+        for word, count in word_count.most_common(5):
+            self.very_common_words.append(word)
+        print(self.very_common_words)
 
-
-
-
-
-
-
-    input_array = []
-    very_common_words = []
-    positive_sentiments = []
-    negative_sentiments = []
-    sad_sentiments = []
-    mad_sentiments = []
-
-    for i in range(1):
-        input_array.append(input("tell me about your day:       "))
-
-    
-    tokens = [word_tokenize(i) for i in input_array]#tokens
-    more_tokens = [sent_tokenize(i) for i in input_array] #seperate variable for tokens
-    flattened_tokens = list(chain.from_iterable(tokens))#flattened tokens
-    tagged_tokens = pos_tag(flattened_tokens)#pos tagged tokens
-    tag_count = Counter([tag for token, tag in tagged_tokens])#count for pos tags
-    print(tag_count) #count of which occur most frequently
-
-    
-    text = " ".join(flattened_tokens)#flattened tokens turned back into text
-    sia = SentimentIntensityAnalyzer()
-    sentiment = sia.polarity_scores(text)
-    print(sentiment) #judges sentiment vaguely, the 1 is positive, and -1 is negative
-
-
-    #asume that 'flattened_tokens' is a list of tokenized words
-    word_count = Counter(flattened_tokens)
-    #print the 10 most common words and their frequency
-    for word, count in word_count.most_common(10):
-        print(f'{word}: {count}')
-
-    
-    # Iterate over the word count dictionary
-    for word, count in word_count.most_common(5):
-    # Add the word to the very_common_words list
-        very_common_words.append(word)
-    print(very_common_words)
-
-    
-    if sentiment['compound'] > 0:
-        positive_sentiments.append("good mood")
-    print(positive_sentiments)
-
-
-    if sentiment['compound'] < 0:
-        negative_sentiments.append("bad mood")
-    print(negative_sentiments)
-
-
-
-
-
-    #try to identify sadness
-    
-    for syn in wordnet.synsets('sad'):
-        for lemma in syn.lemmas():
-            sad_sentiments.append(lemma.name())
-    print(sad_sentiments)
+    def talkative(self):
+        if len(self.flattened_tokens) > 10:
+            print('Talkative')
+        elif len(self.flattened_tokens) < 10:
+            print('Not Talkative')
 
     
-
-    #try to indentify anger
-
-    for syn in wordnet.synsets('mad'):
-        for lemma in syn.lemmas():
-            mad_sentiments.append(lemma.name())
-    print(mad_sentiments)
-
-    #try to indentify anger
+            
+    def pos_tag_count(self):
+        tag_count = Counter([tag for token, tag in self.tagged_tokens])
+        print(tag_count)
 
 
 
@@ -115,9 +86,13 @@ def moodJudgement():
 
 
 
-
-
-
-
-moodJudgement()
-#improve what we have ?
+#run
+mood_judgement = MoodJudgement()
+mood_judgement.get_input()
+mood_judgement.tokenize_input()
+mood_judgement.pos_tag_count()
+mood_judgement.sentiment_analysis()
+mood_judgement.get_common_words()
+mood_judgement.talkative()
+#mood_judgement.sad_analysis()
+mood_judgement.ner()
